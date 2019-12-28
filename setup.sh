@@ -6,7 +6,8 @@ echo "Zip Tool Scripts & Create Template Bucket"
 
 zip -r tools.zip ./tools
 
-aws cloudformation create-stack --stack-name batch-genomics-zone --template-body file://template_cfn.yml --capabilities CAPABILITY_NAMED_IAM --enable-termination-protection --output text;aws cloudformation wait stack-create-complete --stack-name batch-genomics-zone
+aws cloudformation create-stack --stack-name batch-genomics-zone --template-body file://template_cfn.yml --capabilities CAPABILITY_NAMED_IAM --enable-termination-protection --output text
+aws cloudformation wait stack-create-complete --stack-name batch-genomics-zone
 
 echo "Copy Nested Templates to S3 for Deployment"
 
@@ -24,7 +25,8 @@ cd tools
 
 echo "Deploy SSM Automation Docs for Image and Tools Deployment"
 
-aws cloudformation create-stack --stack-name batch-genomics-tools --template-body file://template_cfn.yml --capabilities CAPABILITY_NAMED_IAM --enable-termination-protection --output text --parameters ParameterKey=TemplatesBucketName,ParameterValue=${TEMPLATES_BUCKET_NAME} ParameterKey=TemplatesBucketArn,ParameterValue=${TEMPLATES_BUCKET_ARN};aws cloudformation wait stack-create-complete --stack-name batch-genomics-tools
+aws cloudformation create-stack --stack-name batch-genomics-tools --template-body file://template_cfn.yml --capabilities CAPABILITY_NAMED_IAM --enable-termination-protection --output text --parameters ParameterKey=TemplatesBucketName,ParameterValue=${TEMPLATES_BUCKET_NAME} ParameterKey=TemplatesBucketArn,ParameterValue=${TEMPLATES_BUCKET_ARN}
+aws cloudformation wait stack-create-complete --stack-name batch-genomics-tools
 
 ACCOUNT_ID=$(aws cloudformation describe-stacks --stack-name batch-genomics-tools --query 'Stacks[].Outputs[?OutputKey==`AccountId`].OutputValue' --output text)
 BUILD_AMI_DOC_NAME=$(aws cloudformation describe-stacks --stack-name batch-genomics-tools --query 'Stacks[].Outputs[?OutputKey==`BuildAMIDocumentName`].OutputValue' --output text)
@@ -80,7 +82,8 @@ echo "Deploy Pipeline Stack"
 cd ..
 cd pipeline
 
-aws cloudformation create-stack --stack-name batch-genomics-pipeline --template-body file://template_cfn.yml --capabilities CAPABILITY_NAMED_IAM --enable-termination-protection --output text --parameters ParameterKey=TemplatesBucket,ParameterValue=${TEMPLATES_BUCKET_NAME} ParameterKey=ImageId,ParameterValue=${IMAGE_ID};aws cloudformation wait stack-create-complete --stack-name batch-genomics-pipeline
+aws cloudformation create-stack --stack-name batch-genomics-pipeline --template-body file://template_cfn.yml --capabilities CAPABILITY_NAMED_IAM --enable-termination-protection --output text --parameters ParameterKey=TemplatesBucket,ParameterValue=${TEMPLATES_BUCKET_NAME} ParameterKey=ImageId,ParameterValue=${IMAGE_ID}
+aws cloudformation wait stack-create-complete --stack-name batch-genomics-pipeline
 
 cd ..
 
